@@ -1,50 +1,29 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\UserController;
-use App\Http\Controllers\api\ConsultaController;
-use App\Http\Controllers\AuthController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-Route::group([
-    'middleware' => 'api',
-    'prefix' => 'auth'
-], function ($router) {
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
-    Route::get('/user-profile', [AuthController::class, 'userProfile']);    
+Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
+    Route::post('/login', 'App\Http\Controllers\AuthController@login');
+    Route::post('/register', 'App\Http\Controllers\AuthController@register');
+    Route::post('/logout', 'App\Http\Controllers\AuthController@logout');
+    Route::post('/refresh', 'App\Http\Controllers\AuthController@refresh');
+    Route::get('/user-profile', 'App\Http\Controllers\AuthController@userProfile');    
 });
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-Route::post('login', [UserController::class, 'login']);
-Route::post('register', [UserController::class, 'register']);
-Route::post('logout', [UserController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('checkUser', [UserController::class, 'checkUser']);
-Route::post('saveUser', [UserController::class, 'saveUser']);
-Route::get('getUser', [UserController::class, 'getUser']);
+Route::post('login', 'App\Http\Controllers\api\UserController@login');
+Route::post('register', 'App\Http\Controllers\api\UserController@register');
+Route::post('logout', 'App\Http\Controllers\api\UserController@logout')->middleware('auth:sanctum');
 
-Route::get('all', [ConsultaController::class, 'all']);
-Route::get('getNivel', [ConsultaController::class, 'getNivel']);
-Route::get('getCargos', [ConsultaController::class, 'getCargos']);
-Route::post('savePreference', [ConsultaController::class, 'savePreference']);
-Route::get('getVacantes', [ConsultaController::class, 'getVacantes']);
+Route::get('checkUser', 'App\Http\Controllers\api\UserController@checkUser');
+Route::post('saveUser', 'App\Http\Controllers\api\UserController@saveUser');
+Route::get('getUser', 'App\Http\Controllers\api\UserController@getUser');
+Route::post('saveFcmToken', 'App\Http\Controllers\api\UserController@saveFcmToken');
 
-/*
-Route::group(['prefix' => 'publicaciones', 'middleware' => 'auth:sanctum'], function () {
-    Route::get('all', [ConsultaController::class, 'all']);
-    Route::get('getNivel', [ConsultaController::class, 'getNivel']);
-});*/
+Route::get('all', 'App\Http\Controllers\api\ConsultaController@all');
+Route::get('getNivel', 'App\Http\Controllers\api\ConsultaController@getNivel');
+Route::get('getCargos', 'App\Http\Controllers\api\ConsultaController@getCargos');
+Route::post('savePreference', 'App\Http\Controllers\api\ConsultaController@savePreference');
+Route::get('getVacantes', 'App\Http\Controllers\api\ConsultaController@getVacantes');
+Route::get('getVacanteDetalle/{id}', 'App\Http\Controllers\api\ConsultaController@getVacanteDetalle');
+Route::get('getPreferences', 'App\Http\Controllers\api\ConsultaController@getPreferences');
+Route::delete('deletePreference/{id}', 'App\Http\Controllers\api\ConsultaController@deletePreference');

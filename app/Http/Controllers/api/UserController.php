@@ -111,9 +111,21 @@ class UserController extends Controller
         $user->social_id = $request->social_id;
         $user->social = $request->social;
         $user->email = $request->email;
+        $user->password = Hash::make(uniqid());
         $user->status = 1;
+        $user->paid = 1;
         $user->save();
 
-        return "Usuario creado";
+        return response()->json($user);
+    }
+
+    public function saveFcmToken(Request $request){
+        $user = User::find($request->user_id);
+        if($user){
+            $user->fcm_token = $request->fcm_token;
+            $user->save();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'User not found'], 404);
     }
 }
