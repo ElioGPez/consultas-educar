@@ -1,0 +1,68 @@
+[
+    {
+        "id": 2,
+        "circuitos": "[{\"name\":\"Circuito I\",\"value\":\"I\"},{\"name\":\"Circuito II\",\"value\":\"II\"},{\"name\":\"Circuito III\",\"value\":\"III\"},{\"name\":\"Circuito IV\",\"value\":\"IV\"},{\"name\":\"Circuito V\",\"value\":\"V\"}]",
+        "user_id": 3,
+        "cargo_id": 1,
+        "created_at": "2026-04-26T17:29:29.000000Z",
+        "updated_at": "2026-04-26T17:29:29.000000Z",
+        "cargo": {
+            "id": 1,
+            "nombre": "Plastica",
+            "slug": "plastica",
+            "nivel_id": 1,
+            "created_at": "2023-03-23T14:44:23.000000Z",
+            "updated_at": "2026-06-30T01:40:43.000000Z",
+            "nivel": {
+                "id": 1,
+                "nombre": "EDUCACI\u00d3N INICIAL Y PRIMARIA",
+                "created_at": "2023-02-18T19:14:23.000000Z",
+                "updated_at": "2023-02-18T19:14:23.000000Z"
+            }
+        }
+    },
+    {
+        "id": 3,
+        "circuitos": "[{\"name\":\"Circuito III\",\"value\":\"III\"}]",
+        "user_id": 3,
+        "cargo_id": 3,
+        "created_at": "2026-04-26T17:42:06.000000Z",
+        "updated_at": "2026-04-26T17:42:06.000000Z",
+        "cargo": {
+            "id": 3,
+            "nombre": "DCTOR",
+            "slug": null,
+            "nivel_id": 1,
+            "created_at": "2026-04-26T14:41:09.000000Z",
+            "updated_at": "2026-04-26T00:00:00.000000Z",
+            "nivel": {
+                "id": 1,
+                "nombre": "EDUCACI\u00d3N INICIAL Y PRIMARIA",
+                "created_at": "2023-02-18T19:14:23.000000Z",
+                "updated_at": "2023-02-18T19:14:23.000000Z"
+            }
+        }
+    },
+    {
+        "id": 4,
+        "circuitos": "[{\"name\":\"Circuito I\",\"value\":\"I\"},{\"name\":\"Circuito III\",\"value\":\"III\"},{\"name\":\"Circuito II\",\"value\":\"II\"},{\"name\":\"Circuito IV\",\"value\":\"IV\"},{\"name\":\"Circuito V\",\"value\":\"V\"}]",
+        "user_id": 3,
+        "cargo_id": 135,
+        "created_at": "2026-06-30T01:50:26.000000Z",
+        "updated_at": "2026-06-30T01:50:26.000000Z",
+        "cargo": {
+            "id": 135,
+            "nombre": "PRACTICA PROFESIONAL II",
+            "slug": "practica-profesional-ii",
+            "nivel_id": 4,
+            "created_at": "2026-06-30T01:45:12.000000Z",
+            "updated_at": "2026-06-30T01:45:12.000000Z",
+            "nivel": {
+                "id": 4,
+                "nombre": "NIVEL SUPERIOR, ESPECIAL Y ARTISTICA",
+                "created_at": "2026-06-29T22:44:19.000000Z",
+                "updated_at": "2026-06-29T22:44:19.000000Z"
+            }
+        }
+    }
+]

@@ -35,7 +35,7 @@ class CheckSimeVacancies extends Command
                 $mis_circuitos = array_map(fn($c) => is_array($c) ? ($c['value'] ?? $c) : $c, $circuitos_decodificados);
 
                 try {
-                    $response = Http::get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacantes/'.$nivel_id);
+                    $response = Http::withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacantes/'.$nivel_id);
                     
                     if($response->successful()){
                         $vacantes = $response->json()['vacantes'] ?? [];
@@ -49,7 +49,7 @@ class CheckSimeVacancies extends Command
                                     ->exists();
 
                                 if(!$alreadySent){
-                                    $respPadrones = Http::get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerPadrones/'.$v['id']);
+                                    $respPadrones = Http::withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerPadrones/'.$v['id']);
                                     if($respPadrones->successful()){
                                         $padrones = $respPadrones->json()['padrones'] ?? [];
                                         $circuito_vacante = $padrones[0]["Organizacion"] ?? '';
@@ -80,6 +80,11 @@ class CheckSimeVacancies extends Command
 
     private function checkCircuitoMatch($mis_circuitos, $circuito_vacante) {
         if (empty($mis_circuitos)) return true; // Si no específico circuitos, asumo que quiere todos
+        
+        if (stripos($circuito_vacante, 'CIRCUITO') === false) {
+            return true;
+        }
+
         foreach ($mis_circuitos as $mi_circuito) {
             $pattern = "/CIRCUITO\s+{$mi_circuito}\b/i";
             if (preg_match($pattern, $circuito_vacante)) return true;

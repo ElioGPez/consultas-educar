@@ -24,8 +24,8 @@ class ConsultaController extends Controller
             if(strpos($vacante['cargos'], 'PLASTICA') !== false){
                 $vacante_obj = new stdClass();
 
-                $response2 = Http::get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacante/'.$vacante['id'].'?origen=0&postulante=-1');
-                $response3 = Http::get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerPadrones/'.$vacante['id']);
+                $response2 = Http::withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacante/'.$vacante['id'].'?origen=0&postulante=-1');
+                $response3 = Http::withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerPadrones/'.$vacante['id']);
                 return $response3;
                 $vacante_obj->vacante = $vacante;
                 $vacante_obj->vacante_detalle = $response2['vacante'];
@@ -87,7 +87,7 @@ class ConsultaController extends Controller
     public function getVacantes(Request $request){
         $user_id = $request->user_id ?? 1;
         $preferencias = Preferencia::where('user_id', $user_id)->with(['cargo', 'cargo.nivel'])->get();
-
+        Log::debug($preferencias);
         if($preferencias->isEmpty()) return [];
 
         $array = [];
@@ -102,7 +102,7 @@ class ConsultaController extends Controller
 
             // CACHE: Guardamos la lista del nivel por 10 minutos para no saturar al SIME
             $vacantes_nivel = \Cache::remember("vacantes_nivel_$nivel_id", 600, function() use ($nivel_id) {
-                $response = Http::get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacantes/'.$nivel_id);
+                $response = Http::withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacantes/'.$nivel_id);
                 return $response->successful() ? $response->json()['vacantes'] : [];
             });
 
@@ -122,7 +122,7 @@ class ConsultaController extends Controller
         // PARALELISMO: Pedimos los datos básicos (Padrones) para filtrar por circuito de todas las vacantes juntas
         $responses = Http::pool(function ($pool) use ($array) {
             return array_map(function($v) use ($pool) {
-                return $pool->as($v['id'])->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerPadrones/'.$v['id']);
+                return $pool->as($v['id'])->withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerPadrones/'.$v['id']);
             }, $array);
         });
 
@@ -155,8 +155,8 @@ class ConsultaController extends Controller
         // Este endpoint es nuevo y lo usaremos cuando el usuario haga clic en una vacante
         $responses = Http::pool(function ($pool) use ($id) {
             return [
-                $pool->as('detalle')->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacante/'.$id.'?origen=0&postulante=-1'),
-                $pool->as('especificos')->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerDetalleVacante/'.$id),
+                $pool->as('detalle')->withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacante/'.$id.'?origen=0&postulante=-1'),
+                $pool->as('especificos')->withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerDetalleVacante/'.$id),
             ];
         });
 
@@ -167,7 +167,7 @@ class ConsultaController extends Controller
         $horarios_responses = Http::pool(function ($pool) use ($vacantes_especificos) {
             $reqs = [];
             foreach ($vacantes_especificos as $idx => $e) {
-                $reqs[] = $pool->as($idx)->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerHorarios/'.$e['cargos_id']);
+                $reqs[] = $pool->as($idx)->withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerHorarios/'.$e['cargos_id']);
             }
             return $reqs;
         });
@@ -183,6 +183,9 @@ class ConsultaController extends Controller
     }
 
     public function checkCircuito($circuito, $circuito_vacante){
+        if (stripos($circuito_vacante, 'CIRCUITO') === false) {
+            return true;
+        }
         $pattern = '/CIRCUITO\s+'.$circuito.'(\s+|\(|$)/i';
         return preg_match($pattern, $circuito_vacante);
     }
