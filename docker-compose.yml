@@ -45,8 +45,6 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-consultas}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
-    ports:
-      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
 
