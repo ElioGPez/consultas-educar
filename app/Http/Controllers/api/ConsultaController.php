@@ -92,7 +92,7 @@ class ConsultaController extends Controller
 
         $array = [];
         $ids_procesadas = [];
-        $niveles_consultados = [];
+        $niveles_consultados = []; 
 
         foreach ($preferencias as $pref) {
             $nivel_id = $pref->cargo->nivel_id;
