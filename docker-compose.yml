@@ -15,7 +15,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - storage_data:/var/www/html/storage
 
@@ -34,7 +35,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - storage_data:/var/www/html/storage
 
@@ -45,6 +47,11 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-consultas}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
     volumes:
       - db_data:/var/lib/mysql
 
