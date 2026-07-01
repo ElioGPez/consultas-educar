@@ -60,6 +60,9 @@ jobs:
             export DB_DATABASE=${{ secrets.DB_DATABASE }}
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             
+            # Loguearse en Docker Hub para evitar el límite de 429 Too Many Requests
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            
             # Descargar la imagen recién compilada
             docker compose pull
             
