@@ -47,6 +47,8 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-consultas}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "127.0.0.1:3307:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
