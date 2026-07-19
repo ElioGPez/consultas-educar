@@ -24,6 +24,7 @@ Route::get('getNivel', 'App\Http\Controllers\api\ConsultaController@getNivel');
 Route::get('getCargos', 'App\Http\Controllers\api\ConsultaController@getCargos');
 Route::post('savePreference', 'App\Http\Controllers\api\ConsultaController@savePreference');
 Route::get('getVacantes', 'App\Http\Controllers\api\ConsultaController@getVacantes');
+Route::get('searchVacantes', 'App\Http\Controllers\api\ConsultaController@searchVacantes');
 Route::get('getVacanteDetalle/{id}', 'App\Http\Controllers\api\ConsultaController@getVacanteDetalle');
 Route::get('getPreferences', 'App\Http\Controllers\api\ConsultaController@getPreferences');
 Route::delete('deletePreference/{id}', 'App\Http\Controllers\api\ConsultaController@deletePreference');

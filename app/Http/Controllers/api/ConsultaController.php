@@ -151,6 +151,67 @@ class ConsultaController extends Controller
         return $final_results;
     }
 
+    public function searchVacantes(Request $request){
+        $query = strtoupper($request->query('query', ''));
+        if (empty($query)) return [];
+
+        $niveles = [1, 2, 3, 4, 5, 6, 7]; // Tipos de niveles en sime, podemos iterarlos
+        // Para optimizar en tiempo real, busquemos los niveles de la base de datos
+        $niveles_db = Nivel::all();
+        $array = [];
+        $ids_procesadas = [];
+
+        foreach ($niveles_db as $nivel) {
+            $nivel_id = $nivel->id;
+            
+            // CACHE: Guardamos la lista del nivel por 10 minutos
+            $vacantes_nivel = \Cache::remember("vacantes_nivel_$nivel_id", 600, function() use ($nivel_id) {
+                $response = Http::withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerVacantes/'.$nivel_id);
+                return $response->successful() ? $response->json()['vacantes'] : [];
+            });
+
+            foreach ($vacantes_nivel as $v) {
+                if(in_array($v['id'], $ids_procesadas)) continue;
+                
+                // Buscar por cargo, escuela u otro campo.
+                $cargos = strtoupper($v['cargos'] ?? '');
+                $establecimiento = strtoupper($v['establecimiento'] ?? '');
+                
+                if(strpos($cargos, $query) !== false || strpos($establecimiento, $query) !== false) {
+                    $array[] = $v;
+                    $ids_procesadas[] = $v['id'];
+                }
+            }
+        }
+
+        if(empty($array)) return [];
+
+        // LIMIT to 50 results to keep it fast
+        $array = array_slice($array, 0, 50);
+
+        // Pedimos padrones
+        $responses = Http::pool(function ($pool) use ($array) {
+            return array_map(function($v) use ($pool) {
+                return $pool->as((string)$v['id'])->withoutVerifying()->get('https://sime.educaciontuc.gov.ar/Vacantes/ObtenerPadrones/'.$v['id']);
+            }, $array);
+        });
+
+        $final_results = [];
+        foreach ($array as $v) {
+            $resp_padrones = $responses[(string)$v['id']] ?? null;
+            if($resp_padrones && $resp_padrones->successful()){
+                $padrones = $resp_padrones->json()['padrones'] ?? [];
+                
+                $vacante_obj = new stdClass();
+                $vacante_obj->vacante = $v;
+                $vacante_obj->padrones = $padrones;
+                $final_results[] = $vacante_obj;
+            }
+        }
+
+        return $final_results;
+    }
+
     public function getVacanteDetalle($id) {
         // Este endpoint es nuevo y lo usaremos cuando el usuario haga clic en una vacante
         $responses = Http::pool(function ($pool) use ($id) {
